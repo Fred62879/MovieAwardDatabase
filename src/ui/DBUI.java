@@ -23,18 +23,30 @@ public class DBUI extends JFrame implements ActionListener {
 
     // button panel
     private JPanel buttonPane;
-    private JButton bt1;
-    private JButton bt2;
-    private JButton bt3;
-    private JButton bt4;
-    private JButton bt5;
-    private JButton bt6;
+    private JButton insert;
+    private JButton delete;
+    private JButton update;
+    private JButton show;
+    private JButton quit;
+
+    private int cho;
+
+    private JButton submit;
     // display panel
     private JPanel showPane;
     private JTable table;
 
     public DBUI() {
         super("MovieAward DBMS GUI");
+    }
+
+    public void invoke() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new DBUI().initialize();
+            }
+        });
     }
 
     // MODIFIES: this
@@ -58,19 +70,29 @@ public class DBUI extends JFrame implements ActionListener {
     // EFFECTS: respond to user action
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand() == "Button 1") {
-            display();
+        switch (e.getActionCommand()) {
+            case "insert":
+                this.cho = 1;
+            case "delete":
+                this.cho = 2;
+            case "update":
+                this.cho = 3;
+            case "show":
+                this.cho = 4;
+            case "quit":
+                this.cho = 5;
         }
     }
 
-    private void button() {
-        bt1 = new JButton("Button 1");
-        bt1.addActionListener(this);
+    private void button(String txt) {
+        JButton res = new JButton(txt);
+        res.addActionListener(this);
         constraints.ipady = 0; // reset
         constraints.gridwidth = 2;
         constraints.gridx = 1;
         constraints.gridy = 2;
-        buttonPane.add(bt1, constraints);
+        buttonPane.add(res, constraints);
+        System.out.println("1");
     }
 
     public JPanel buttonPanel() {
@@ -79,7 +101,8 @@ public class DBUI extends JFrame implements ActionListener {
         // create field
         constraints.fill = GridBagConstraints.HORIZONTAL;
         // set panel
-        button();
+        String[] chos = { "insert", "delete", "update", "show", "quit" };
+        for (String cho : chos) button(cho);
         buttonPane.setBorder(BorderFactory.createLineBorder(Color.black));
 
         return buttonPane;
@@ -107,4 +130,116 @@ public class DBUI extends JFrame implements ActionListener {
         revalidate();
         repaint();
     }
+
+
+    // processing fns
+    public void process() {
+
+    }
+
+    pivate void createTables() {
+
+    }
+
+    private void handleDeleteOption() {
+//        int aID = INVALID_INPUT;
+//        while (aID == INVALID_INPUT) {
+//            System.out.print("Please enter the award ID you wish to delete: ");
+//            aID = readInteger(false);
+//            if (aID != INVALID_INPUT) {
+//                delegate.deleteAward(aID);
+//            }
+//        }
+
+    }
+
+    private void handleInsertOption() {
+        int aID = INVALID_INPUT;
+        while (aID == INVALID_INPUT) {
+            System.out.print("Please enter the award ID you wish to insert: ");
+            aID = readInteger(false);
+        }
+
+        String name = null;
+        while (name == null || name.length() <= 0) {
+            System.out.print("Please enter the award name you wish to insert: ");
+            name = readLine().trim();
+        }
+
+        // branch address is allowed to be null so we don't need to repeatedly ask for the addres
+        System.out.print("Please enter the award start date you wish to insert: ");
+        String startdate = readLine().trim();
+        if (startdate.length() == 0) {
+            startdate = null;
+        }
+
+        String enddate = null;
+        while (enddate == null || enddate.length() <= 0) {
+            System.out.print("Please enter the award end date you wish to insert: ");
+            enddate = readLine().trim();
+        }
+
+        Award model = new Award(aID, startdate, enddate, name);
+        delegate.insertAward(model);
+    }
+
+    private void handleQuitOption() {
+        System.out.println("Good Bye!");
+
+        if (bufferedReader != null) {
+            try {
+                bufferedReader.close();
+            } catch (IOException e) {
+                System.out.println("IOException!");
+            }
+        }
+
+        delegate.addAwardFinished();
+    }
+
+    private void handleUpdateOption() {
+        int aID = INVALID_INPUT;
+        while (aID == INVALID_INPUT) {
+            System.out.print("Please enter the award ID you wish to update: ");
+            aID = readInteger(false);
+        }
+
+        String name = null;
+        while (name == null || name.length() <= 0) {
+            System.out.print("Please enter the award name you wish to update: ");
+            name = readLine().trim();
+        }
+
+        delegate.updateAward(aID, name);
+    }
+
+    private int readInteger(boolean allowEmpty) {
+        String line = null;
+        int input = INVALID_INPUT;
+        try {
+            line = bufferedReader.readLine();
+            input = Integer.parseInt(line);
+        } catch (IOException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        } catch (NumberFormatException e) {
+            if (allowEmpty && line.length() == 0) {
+                input = EMPTY_INPUT;
+            } else {
+                System.out.println(WARNING_TAG + " Your input was not an integer");
+            }
+        }
+        return input;
+    }
+
+    private String readLine() {
+        String result = null;
+        try {
+            result = bufferedReader.readLine();
+        } catch (IOException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+
 }

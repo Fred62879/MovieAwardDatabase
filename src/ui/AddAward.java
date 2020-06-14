@@ -18,6 +18,7 @@ public class AddAward {
 
     private BufferedReader bufferedReader = null;
     private AddAwardDelegate delegate = null;
+    private DBUI dbui;
 
     public AddAward() {
     }
@@ -29,7 +30,10 @@ public class AddAward {
         int choice = INVALID_INPUT;
 
         while(choice != 1 && choice != 2) {
-            System.out.println("If you have a table called Branch in your database (capitialization of the name does not matter), it will be dropped and a new Branch table will be created.\nIf you want to proceed, enter 1; if you want to quit, enter 2.");
+            System.out.println("If you have a table called Branch in your database " +
+                    "(capitialization of the name does not matter), it will be " +
+                    "dropped and a new Branch table will be created.\n" +
+                    "If you want to proceed, enter 1; if you want to quit, enter 2.");
 
             choice = readInteger(false);
 
@@ -51,10 +55,11 @@ public class AddAward {
 
     public void showMainMenu(AddAwardDelegate delegate) {
         this.delegate = delegate;
-
+        this.dbui = new DBUI();
+        this.dbui.invoke();
+        /*
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         int choice = INVALID_INPUT;
-
         while (choice != 5) {
             System.out.println();
             System.out.println("1. Insert Award");
@@ -91,6 +96,7 @@ public class AddAward {
                 }
             }
         }
+         */
     }
 
     private void handleDeleteOption() {

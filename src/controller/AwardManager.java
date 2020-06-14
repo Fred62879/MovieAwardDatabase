@@ -21,6 +21,7 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
     private void start() {
         loginWindow = new LoginWindow();
         loginWindow.showFrame(this);
+
     }
 
     /**
