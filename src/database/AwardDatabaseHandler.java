@@ -147,7 +147,8 @@ public class AwardDatabaseHandler {
 
         try {
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE branch (branch_id integer PRIMARY KEY, branch_name varchar2(20) not null, branch_addr varchar2(50), branch_city varchar2(20) not null, branch_phone integer)");
+            stmt.executeUpdate("CREATE TABLE award (aID integer PRIMARY KEY, " +
+                    "startdate varchar2(10), enddate varchar2(10), " + "name varchar2(20) not null)");
             stmt.close();
         } catch (SQLException e) {
             System.out.println(EXCEPTION_TAG + " " + e.getMessage());
