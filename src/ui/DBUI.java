@@ -92,7 +92,6 @@ public class DBUI extends JFrame implements ActionListener {
         constraints.gridx = 1;
         constraints.gridy = 2;
         buttonPane.add(res, constraints);
-        System.out.println("1");
     }
 
     public JPanel buttonPanel() {
@@ -102,7 +101,17 @@ public class DBUI extends JFrame implements ActionListener {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         // set panel
         String[] chos = { "insert", "delete", "update", "show", "quit" };
-        for (String cho : chos) button(cho);
+
+        constraints.ipady = 0; // reset
+        constraints.gridwidth = 2;
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        for (String cho : chos) {
+            JButton res = new JButton(cho);
+            res.addActionListener(this);
+            buttonPane.add(res, constraints);
+            // button(cho);
+        }
         buttonPane.setBorder(BorderFactory.createLineBorder(Color.black));
 
         return buttonPane;
@@ -137,10 +146,6 @@ public class DBUI extends JFrame implements ActionListener {
 
     }
 
-    pivate void createTables() {
-
-    }
-
     private void handleDeleteOption() {
 //        int aID = INVALID_INPUT;
 //        while (aID == INVALID_INPUT) {
@@ -153,6 +158,7 @@ public class DBUI extends JFrame implements ActionListener {
 
     }
 
+    /*
     private void handleInsertOption() {
         int aID = INVALID_INPUT;
         while (aID == INVALID_INPUT) {
@@ -240,6 +246,8 @@ public class DBUI extends JFrame implements ActionListener {
         }
         return result;
     }
+
+     */
 
 
 }

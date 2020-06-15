@@ -25,7 +25,8 @@ public class AddAward {
 
     public void setupDatabase(AddAwardDelegate delegate) {
         this.delegate = delegate;
-
+        delegate.awarddatabaseSetup();
+        /*
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         int choice = INVALID_INPUT;
 
@@ -51,6 +52,7 @@ public class AddAward {
                 }
             }
         }
+         */
     }
 
     public void showMainMenu(AddAwardDelegate delegate) {
