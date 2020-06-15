@@ -5,6 +5,7 @@ import delegates.AddAwardDelegate;
 import delegates.LoginWindowDelegate;
 import model.Award;
 import ui.AddAward;
+import ui.DBUI;
 import ui.LoginWindow;
 
 /**
@@ -13,9 +14,11 @@ import ui.LoginWindow;
 public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
     private AwardDatabaseHandler adbHandler = null;
     private LoginWindow loginWindow = null;
+    private DBUI dbui;
 
     public AwardManager() {
         adbHandler = new AwardDatabaseHandler();
+        dbui = new DBUI();
     }
 
     private void start() {
@@ -38,7 +41,8 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
 
             AddAward addAward = new AddAward();
             addAward.setupDatabase(this);
-            addAward.showMainMenu(this);
+            dbui.invoke();
+            // addAward.showMainMenu(this);
         } else {
             loginWindow.handleLoginFailed();
 
