@@ -2,6 +2,9 @@ package ui;
 
 // import model.*;
 
+import delegates.AddAwardDelegate;
+import model.Award;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -9,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,6 +25,13 @@ public class DBUI extends JFrame implements ActionListener {
     private Container container;
     private GridBagConstraints constraints;
 
+    private static final String EXCEPTION_TAG = "[EXCEPTION]";
+    private static final String WARNING_TAG = "[WARNING]";
+    private static final int INVALID_INPUT = Integer.MIN_VALUE;
+    private static final int EMPTY_INPUT = 0;
+    private BufferedReader bufferedReader = null;
+    private AddAwardDelegate delegate = null;
+
     // button panel
     private JPanel buttonPane;
     private JButton insert;
@@ -29,7 +40,7 @@ public class DBUI extends JFrame implements ActionListener {
     private JButton show;
     private JButton quit;
 
-    private int cho;
+    private int cho = -1;
 
     private JButton submit;
     // display panel
@@ -72,15 +83,22 @@ public class DBUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "insert":
-                this.cho = 1;
+                handleInsertOption();
+                break;
             case "delete":
-                this.cho = 2;
+                handleDeleteOption();
+                break;
             case "update":
-                this.cho = 3;
+                handleUpdateOption();
+                break;
             case "show":
-                this.cho = 4;
+                break;
             case "quit":
-                this.cho = 5;
+                handleQuitOption();
+                break;
+            default:
+                System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
+                break;
         }
     }
 
@@ -97,23 +115,20 @@ public class DBUI extends JFrame implements ActionListener {
     public JPanel buttonPanel() {
         buttonPane = new JPanel();
         buttonPane.setLayout(new GridBagLayout());
-        // create field
-        constraints.fill = GridBagConstraints.HORIZONTAL;
         // set panel
         String[] chos = { "insert", "delete", "update", "show", "quit" };
-
-        constraints.ipady = 0; // reset
-        constraints.gridwidth = 2;
-        constraints.gridx = 1;
-        constraints.gridy = 2;
+        int i = 0, c = 3;
+        JButton cur;
         for (String cho : chos) {
-            JButton res = new JButton(cho);
-            res.addActionListener(this);
-            buttonPane.add(res, constraints);
-            // button(cho);
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.gridx = i % c;
+            constraints.gridy = i / c;
+            i++;
+            cur = new JButton(cho);
+            cur.addActionListener(this);
+            buttonPane.add(cur, constraints);
         }
         buttonPane.setBorder(BorderFactory.createLineBorder(Color.black));
-
         return buttonPane;
     }
 
@@ -127,9 +142,10 @@ public class DBUI extends JFrame implements ActionListener {
         return showPane;
     }
 
-    private void display() {
+    private void display(String txt) {
         container.remove(showPane);
-        showPane.add(new JLabel("Dummy"));
+        showPanel();
+        showPane.add(new JLabel(txt));
         showPane.setBorder(BorderFactory.createLineBorder(Color.black));
         reconstruct();
     }
@@ -140,27 +156,26 @@ public class DBUI extends JFrame implements ActionListener {
         repaint();
     }
 
+    public int getCho() {
+        return this.cho;
+    }
 
     // processing fns
-    public void process() {
-
-    }
-
     private void handleDeleteOption() {
-//        int aID = INVALID_INPUT;
-//        while (aID == INVALID_INPUT) {
-//            System.out.print("Please enter the award ID you wish to delete: ");
-//            aID = readInteger(false);
-//            if (aID != INVALID_INPUT) {
-//                delegate.deleteAward(aID);
-//            }
-//        }
-
+        int aID = INVALID_INPUT;
+        display("delete operation result");
+        while (aID == INVALID_INPUT) {
+            System.out.print("Please enter the award ID you wish to delete: ");
+            aID = readInteger(false);
+            if (aID != INVALID_INPUT) {
+                delegate.deleteAward(aID);
+            }
+        }
     }
 
-    /*
     private void handleInsertOption() {
         int aID = INVALID_INPUT;
+        display("insert operation result");
         while (aID == INVALID_INPUT) {
             System.out.print("Please enter the award ID you wish to insert: ");
             aID = readInteger(false);
@@ -172,7 +187,7 @@ public class DBUI extends JFrame implements ActionListener {
             name = readLine().trim();
         }
 
-        // branch address is allowed to be null so we don't need to repeatedly ask for the addres
+        // branch address is allowed to be null so we don't need to repeatedly ask for the address
         System.out.print("Please enter the award start date you wish to insert: ");
         String startdate = readLine().trim();
         if (startdate.length() == 0) {
@@ -190,6 +205,7 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleQuitOption() {
+        display("quit operation result");
         System.out.println("Good Bye!");
 
         if (bufferedReader != null) {
@@ -204,6 +220,7 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleUpdateOption() {
+        display("update operation result");
         int aID = INVALID_INPUT;
         while (aID == INVALID_INPUT) {
             System.out.print("Please enter the award ID you wish to update: ");
@@ -247,7 +264,8 @@ public class DBUI extends JFrame implements ActionListener {
         return result;
     }
 
-     */
-
-
+    public static void main(String[] args) {
+        DBUI dbui = new DBUI();
+        dbui.invoke();
+    }
 }
