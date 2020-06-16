@@ -162,46 +162,72 @@ public class DBUI extends JFrame implements ActionListener {
 
     // processing fns
     private void handleDeleteOption() {
-        int aID = INVALID_INPUT;
-        display("delete operation result");
-        while (aID == INVALID_INPUT) {
-            System.out.print("Please enter the award ID you wish to delete: ");
-            aID = readInteger(false);
-            if (aID != INVALID_INPUT) {
-                delegate.deleteAward(aID);
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
+
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enterid = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enterid);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Delete Award",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+        if (input == JOptionPane.OK_OPTION) {
+            int aID = INVALID_INPUT;
+            while (aID == INVALID_INPUT) {
+                aID = Integer.parseInt(enterid.getText());
+                if (aID != INVALID_INPUT) {
+                    delegate.deleteAward(aID);
+                }
             }
         }
     }
 
+
     private void handleInsertOption() {
-        int aID = INVALID_INPUT;
-        display("insert operation result");
-        while (aID == INVALID_INPUT) {
-            System.out.print("Please enter the award ID you wish to insert: ");
-            aID = readInteger(false);
-        }
+        JPanel p = new JPanel(new BorderLayout(5, 5));
 
-        String name = null;
-        while (name == null || name.length() <= 0) {
-            System.out.print("Please enter the award name you wish to insert: ");
-            name = readLine().trim();
-        }
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award name: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award start date: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award end date: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
 
-        // branch address is allowed to be null so we don't need to repeatedly ask for the address
-        System.out.print("Please enter the award start date you wish to insert: ");
-        String startdate = readLine().trim();
-        if (startdate.length() == 0) {
-            startdate = null;
-        }
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enterid = new JTextField("");
+        JTextField entername = new JTextField("");
+        JTextField enterstartdate = new JTextField("");
+        JTextField enterenddate = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enterid);
+        controls.add(entername);
+        controls.add(enterstartdate);
+        controls.add(enterenddate);
 
-        String enddate = null;
-        while (enddate == null || enddate.length() <= 0) {
-            System.out.print("Please enter the award end date you wish to insert: ");
-            enddate = readLine().trim();
-        }
+        int input = JOptionPane.showOptionDialog(null, p, "Insert Award",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
-        Award model = new Award(aID, startdate, enddate, name);
-        delegate.insertAward(model);
+        if (input == JOptionPane.OK_OPTION) {
+            int aID = INVALID_INPUT;
+            while (aID == INVALID_INPUT) {
+                aID = Integer.parseInt(enterid.getText());
+                String name = null;
+                name = entername.getText();
+                String startdate = null;
+                startdate = enterstartdate.getText();
+                String enddate = null;
+                enddate = enterenddate.getText();
+                if (aID != INVALID_INPUT) {
+                    System.out.println(aID + startdate + enddate + name);
+                    Award model = new Award(aID, startdate, enddate, name);
+                    delegate.insertAward(model);
+                }
+            }
+        }
     }
 
     private void handleQuitOption() {
@@ -220,48 +246,34 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleUpdateOption() {
-        display("update operation result");
-        int aID = INVALID_INPUT;
-        while (aID == INVALID_INPUT) {
-            System.out.print("Please enter the award ID you wish to update: ");
-            aID = readInteger(false);
-        }
+        JPanel p = new JPanel(new BorderLayout(5, 5));
 
-        String name = null;
-        while (name == null || name.length() <= 0) {
-            System.out.print("Please enter the award name you wish to update: ");
-            name = readLine().trim();
-        }
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award name: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
 
-        delegate.updateAward(aID, name);
-    }
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enterid = new JTextField("");
+        JTextField entername = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enterid);
+        controls.add(entername);
 
-    private int readInteger(boolean allowEmpty) {
-        String line = null;
-        int input = INVALID_INPUT;
-        try {
-            line = bufferedReader.readLine();
-            input = Integer.parseInt(line);
-        } catch (IOException e) {
-            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
-        } catch (NumberFormatException e) {
-            if (allowEmpty && line.length() == 0) {
-                input = EMPTY_INPUT;
-            } else {
-                System.out.println(WARNING_TAG + " Your input was not an integer");
+        int input = JOptionPane.showOptionDialog(null, p, "Update Award",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+        if (input == JOptionPane.OK_OPTION) {
+            int aID = INVALID_INPUT;
+            while (aID == INVALID_INPUT) {
+                aID = Integer.parseInt(enterid.getText());
+                String name = null;
+                name = entername.getText();
+                if (aID != INVALID_INPUT) {
+                    delegate.updateAward(aID, name);
+                }
             }
         }
-        return input;
-    }
-
-    private String readLine() {
-        String result = null;
-        try {
-            result = bufferedReader.readLine();
-        } catch (IOException e) {
-            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
-        }
-        return result;
     }
 
     public static void main(String[] args) {
