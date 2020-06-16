@@ -1,14 +1,16 @@
 package delegates;
 
 import model.Award;
+import java.util.List;
 
 public interface AddAwardDelegate {
     public void awarddatabaseSetup();
 
-    public void deleteAward(int aID);
     public void insertAward(Award model);
-    public void showAward();
+    public void deleteAward(int aID);
+    public void selectAward(List<String> fields);
     public void updateAward(int aID, String name);
+    public String showAward();
 
     public void addAwardFinished();
 }

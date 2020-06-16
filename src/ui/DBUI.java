@@ -1,29 +1,21 @@
 package ui;
 
-// import model.*;
-
 import delegates.AddAwardDelegate;
 import model.Award;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.InputStreamReader;
 
 public class DBUI extends JFrame implements ActionListener {
 
     private Container container;
     private GridBagConstraints constraints;
+    private JPanel buttonPane;
+    private JPanel showPane;
 
     private static final String EXCEPTION_TAG = "[EXCEPTION]";
     private static final String WARNING_TAG = "[WARNING]";
@@ -32,30 +24,18 @@ public class DBUI extends JFrame implements ActionListener {
     private BufferedReader bufferedReader = null;
     private AddAwardDelegate delegate = null;
 
-    // button panel
-    private JPanel buttonPane;
-    private JButton insert;
-    private JButton delete;
-    private JButton update;
-    private JButton show;
-    private JButton quit;
 
-    private int cho = -1;
-
-    private JButton submit;
-    // display panel
-    private JPanel showPane;
-    private JTable table;
-
-    public DBUI() {
+    public DBUI(AddAwardDelegate delegate) {
         super("MovieAward DBMS GUI");
+        this.delegate = delegate;
     }
 
-    public void invoke() {
+    public void invoke(AddAwardDelegate delegate) {
+        this.delegate = delegate;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new DBUI().initialize();
+                new DBUI(delegate).initialize();
             }
         });
     }
@@ -78,45 +58,12 @@ public class DBUI extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    // EFFECTS: respond to user action
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "insert":
-                handleInsertOption();
-                break;
-            case "delete":
-                handleDeleteOption();
-                break;
-            case "update":
-                handleUpdateOption();
-                break;
-            case "show":
-                break;
-            case "quit":
-                handleQuitOption();
-                break;
-            default:
-                System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
-                break;
-        }
-    }
-
-    private void button(String txt) {
-        JButton res = new JButton(txt);
-        res.addActionListener(this);
-        constraints.ipady = 0; // reset
-        constraints.gridwidth = 2;
-        constraints.gridx = 1;
-        constraints.gridy = 2;
-        buttonPane.add(res, constraints);
-    }
-
     public JPanel buttonPanel() {
         buttonPane = new JPanel();
         buttonPane.setLayout(new GridBagLayout());
         // set panel
-        String[] chos = { "insert", "delete", "update", "show", "quit" };
+        String[] chos = { "insert", "delete", "update", "selection", "projection",
+                "join", "aggregation", "nestedAgg", "division", "show", "quit" };
         int i = 0, c = 3;
         JButton cur;
         for (String cho : chos) {
@@ -156,36 +103,48 @@ public class DBUI extends JFrame implements ActionListener {
         repaint();
     }
 
-    public int getCho() {
-        return this.cho;
-    }
-
-    // processing fns
-    private void handleDeleteOption() {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-
-        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
-        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
-        p.add(labels, BorderLayout.WEST);
-
-        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
-        JTextField enterid = new JTextField("");
-        p.add(controls, BorderLayout.CENTER);
-        controls.add(enterid);
-
-        int input = JOptionPane.showOptionDialog(null, p, "Delete Award",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-        if (input == JOptionPane.OK_OPTION) {
-            int aID = INVALID_INPUT;
-            while (aID == INVALID_INPUT) {
-                aID = Integer.parseInt(enterid.getText());
-                if (aID != INVALID_INPUT) {
-                    delegate.deleteAward(aID);
-                }
-            }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getActionCommand()) {
+            case "insert":
+                handleInsertOption();
+                break;
+            case "delete":
+                handleDeleteOption();
+                break;
+            case "update":
+                handleUpdateOption();
+                break;
+            case "selection":
+                handleSelectionOption();
+            case "projection":
+                handleProjectionOption();
+            case "join":
+                handleJoinOption();
+            case "aggregate":
+                handleAggregateOption();
+            case "nestedAgg":
+                handleNestedAggOption();
+            case "division":
+                handleDivisionOption();
+            case "show":
+                handleShowOption();
+                break;
+            case "quit":
+                handleQuitOption();
+                break;
+            default:
+                System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
+                break;
         }
     }
 
+    // processing fns
+    public void setupDatabase(AddAwardDelegate delegate) {
+        this.delegate = delegate;
+        if (delegate == null) System.out.println("3delegate = " + delegate);
+        delegate.awarddatabaseSetup();
+    }
 
     private void handleInsertOption() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
@@ -224,25 +183,36 @@ public class DBUI extends JFrame implements ActionListener {
                 if (aID != INVALID_INPUT) {
                     System.out.println(aID + startdate + enddate + name);
                     Award model = new Award(aID, startdate, enddate, name);
+                    if (delegate == null) System.out.println("here");
                     delegate.insertAward(model);
                 }
             }
         }
     }
 
-    private void handleQuitOption() {
-        display("quit operation result");
-        System.out.println("Good Bye!");
+    private void handleDeleteOption() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
 
-        if (bufferedReader != null) {
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                System.out.println("IOException!");
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
+
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enterid = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enterid);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Delete Award",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+        if (input == JOptionPane.OK_OPTION) {
+            int aID = INVALID_INPUT;
+            while (aID == INVALID_INPUT) {
+                aID = Integer.parseInt(enterid.getText());
+                if (aID != INVALID_INPUT) {
+                    delegate.deleteAward(aID);
+                }
             }
         }
-
-        delegate.addAwardFinished();
     }
 
     private void handleUpdateOption() {
@@ -276,8 +246,96 @@ public class DBUI extends JFrame implements ActionListener {
         }
     }
 
+    private void handleSelectionOption() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award name: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
+
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enterid = new JTextField("");
+        JTextField entername = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enterid);
+        controls.add(entername);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Update Award",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+        if (input == JOptionPane.OK_OPTION) {
+            int aID = INVALID_INPUT;
+            while (aID == INVALID_INPUT) {
+                aID = Integer.parseInt(enterid.getText());
+                String name = null;
+                name = entername.getText();
+                if (aID != INVALID_INPUT) {
+                    delegate.updateAward(aID, name);
+                }
+            }
+        }
+    }
+
+    private void handleProjectionOption() {}
+
+    private void handleJoinOption() {}
+
+    private void handleAggregateOption() {}
+
+    private void handleNestedAggOption() {}
+
+    private void handleDivisionOption() {}
+
+    private void handleShowOption() {
+        delegate.showAward();
+    }
+
+    private void handleQuitOption() {
+        display("quit operation result");
+        System.out.println("Good Bye!");
+
+        if (bufferedReader != null) {
+            try {
+                bufferedReader.close();
+            } catch (IOException e) {
+                System.out.println("IOException!");
+            }
+        }
+
+        delegate.addAwardFinished();
+    }
+
+    private int readInteger(boolean allowEmpty) {
+        String line = null;
+        int input = INVALID_INPUT;
+        try {
+            line = bufferedReader.readLine();
+            input = Integer.parseInt(line);
+        } catch (IOException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        } catch (NumberFormatException e) {
+            if (allowEmpty && line.length() == 0) {
+                input = EMPTY_INPUT;
+            } else {
+                System.out.println(WARNING_TAG + " Your input was not an integer");
+            }
+        }
+        return input;
+    }
+
+    private String readLine() {
+        String result = null;
+        try {
+            result = bufferedReader.readLine();
+        } catch (IOException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
-        DBUI dbui = new DBUI();
-        dbui.invoke();
+        // DBUI dbui = new DBUI();
+        // dbui.invoke();
     }
 }

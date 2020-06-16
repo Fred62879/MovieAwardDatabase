@@ -8,23 +8,22 @@ import ui.AddAward;
 import ui.DBUI;
 import ui.LoginWindow;
 
+import java.util.List;
+
 /**
  * This is the main controller class that will orchestrate everything.
  */
 public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
     private AwardDatabaseHandler adbHandler = null;
     private LoginWindow loginWindow = null;
-    private DBUI dbui;
 
     public AwardManager() {
         adbHandler = new AwardDatabaseHandler();
-        dbui = new DBUI();
     }
 
     private void start() {
         loginWindow = new LoginWindow();
         loginWindow.showFrame(this);
-
     }
 
     /**
@@ -38,14 +37,14 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         if (didConnect) {
             // Once connected, remove login window and start text transaction flow
             loginWindow.dispose();
-
-            AddAward addAward = new AddAward();
-            addAward.setupDatabase(this);
-            dbui.invoke();
+            // AddAward addAward = new AddAward();
+            // addAward.setupDatabase(this);
             // addAward.showMainMenu(this);
+            DBUI dbui = new DBUI(this);
+            dbui.setupDatabase(this);
+            dbui.invoke(this);
         } else {
             loginWindow.handleLoginFailed();
-
             if (loginWindow.hasReachedMaxLoginAttempts()) {
                 loginWindow.dispose();
                 System.out.println("You have exceeded your number of allowed attempts");
@@ -54,12 +53,12 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         }
     }
 
-    public void insertAward(Award model) {
-        adbHandler.insertAward(model);
-    }
-
     public void awarddatabaseSetup() {
         adbHandler.awarddatabaseSetup();
+    }
+
+    public void insertAward(Award model) {
+        adbHandler.insertAward(model);
     }
 
     public void deleteAward(int aID) {
@@ -70,7 +69,12 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.updateAward(aID, name);
     }
 
-    public void showAward() {
+    public void selectAward(List<String> fields) {
+        adbHandler.selectAward(fields);
+    }
+
+    public String showAward() {
+        String res = "";
         Award[] models = adbHandler.getAwardInfo();
 
         for (int i = 0; i < models.length; i++) {
@@ -83,6 +87,7 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
             System.out.printf("%-20.20s", model.getEndDate());
             System.out.println();
         }
+        return res;
     }
 
     public void addAwardFinished() {

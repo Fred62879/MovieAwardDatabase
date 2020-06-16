@@ -2,7 +2,6 @@ package ui;
 
 import delegates.AddAwardDelegate;
 import model.Award;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,7 +25,7 @@ public class AddAward {
     public void setupDatabase(AddAwardDelegate delegate) {
         this.delegate = delegate;
         delegate.awarddatabaseSetup();
-        /*
+
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         int choice = INVALID_INPUT;
 
@@ -52,23 +51,14 @@ public class AddAward {
                 }
             }
         }
-         */
     }
 
     public void showMainMenu(AddAwardDelegate delegate) {
         this.delegate = delegate;
-        this.dbui = new DBUI();
-        this.dbui.invoke();
 
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        // int choice = INVALID_INPUT;
-        int choice = -1;
-        while (choice < 0)
-            choice = dbui.getCho();
+        int choice = INVALID_INPUT;
         while (choice != 5) {
-            choice = dbui.getCho();
-            System.out.println(choice);
-            /*
             System.out.println();
             System.out.println("1. Insert Award");
             System.out.println("2. Delete Award");
@@ -79,7 +69,6 @@ public class AddAward {
 
             choice = readInteger(false);
             System.out.println(" ");
-            */
 
             if (choice != INVALID_INPUT) {
                 switch (choice) {

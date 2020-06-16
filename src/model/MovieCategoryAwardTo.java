@@ -4,7 +4,7 @@ public class MovieCategoryAwardTo {
     private final String award_ID;
     private final String movie_ID;
 
-    public MovieCategoryAward(String awardID, String movieID) {
+    public MovieCategoryAwardTo(String awardID, String movieID) {
         this.award_ID = awardID;
         this.movie_ID = movieID;
     }

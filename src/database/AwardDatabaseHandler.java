@@ -4,6 +4,7 @@ import model.Award;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles all database related transactions
@@ -36,6 +37,24 @@ public class AwardDatabaseHandler {
         }
     }
 
+    public void insertAward(Award model) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO award VALUES (?,?,?,?)");
+            ps.setInt(1, model.getAID());
+            ps.setString(2, model.getName());
+            ps.setString(3, model.getStartDate());
+            ps.setString(4, model.getEndDate());
+
+            ps.executeUpdate();
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
     public void deleteAward(int aID) {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM award WHERE aID = ?");
@@ -55,22 +74,26 @@ public class AwardDatabaseHandler {
         }
     }
 
-    public void insertAward(Award model) {
+    public void updateAward(int aID, String name) {
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO award VALUES (?,?,?,?)");
-            ps.setInt(1, model.getAID());
-            ps.setString(2, model.getName());
-            ps.setString(3, model.getStartDate());
-            ps.setString(4, model.getEndDate());
+            PreparedStatement ps = connection.prepareStatement("UPDATE name SET name = ? WHERE aID = ?");
+            ps.setString(1, name);
+            ps.setInt(2, aID);
 
-            ps.executeUpdate();
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println(WARNING_TAG + " Award " + aID + " does not exist!");
+            }
             connection.commit();
-
             ps.close();
         } catch (SQLException e) {
             System.out.println(EXCEPTION_TAG + " " + e.getMessage());
             rollbackConnection();
         }
+    }
+
+    public void selectAward(List<String> fields) {
+
     }
 
     public Award[] getAwardInfo() {
@@ -95,26 +118,6 @@ public class AwardDatabaseHandler {
         }
 
         return result.toArray(new Award[result.size()]);
-    }
-
-    public void updateAward(int aID, String name) {
-        try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE name SET name = ? WHERE aID = ?");
-            ps.setString(1, name);
-            ps.setInt(2, aID);
-
-            int rowCount = ps.executeUpdate();
-            if (rowCount == 0) {
-                System.out.println(WARNING_TAG + " Award " + aID + " does not exist!");
-            }
-
-            connection.commit();
-
-            ps.close();
-        } catch (SQLException e) {
-            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
-            rollbackConnection();
-        }
     }
 
     public boolean login(String username, String password) {
@@ -144,7 +147,6 @@ public class AwardDatabaseHandler {
 
     public void awarddatabaseSetup() {
         dropAwardTableIfExists();
-
         try {
             Statement stmt = connection.createStatement();
             stmt.executeUpdate("CREATE TABLE award (aID integer PRIMARY KEY, " +
