@@ -70,13 +70,20 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.updateAward(aID, name);
     }
 
-    public void selectAward(String award) {
-        adbHandler.selectAward(award);
+
+//    public void selectAward(String award) {
+//        adbHandler.selectAward(award);
+    public String findStaffIds(String role) {
+        return adbHandler.findStaffIds(role);
     }
 
-    public void projectAward(List<String> fields) { adbHandler.projectAward(fields); }
+    public void selectAward(List<String> fields) {
+        // adbHandler.selectAward(fields);
+    }
 
-    public void joinAward(List<String> fields) { adbHandler.joinAward(fields); }
+    public List<String[]> projectAward(List<String> fields) { return adbHandler.projectAward(fields); }
+
+    public List<String[]> joinAward(List<String> f1, List<String> f2, String t1, String t2, String c1, String c2) { return adbHandler.joinAward(f1, f2, t1, t2, c1, c2); }
 
     public String[][] showAward() {
         Award[] models = adbHandler.getAwardInfo();
