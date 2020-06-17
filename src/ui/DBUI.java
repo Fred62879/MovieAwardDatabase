@@ -2,13 +2,18 @@ package ui;
 
 import delegates.AddAwardDelegate;
 import model.Award;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBUI extends JFrame implements ActionListener {
 
@@ -16,6 +21,7 @@ public class DBUI extends JFrame implements ActionListener {
     private GridBagConstraints constraints;
     private JPanel buttonPane;
     private JPanel showPane;
+    private JTable table;
 
     private static final String EXCEPTION_TAG = "[EXCEPTION]";
     private static final String WARNING_TAG = "[WARNING]";
@@ -30,6 +36,10 @@ public class DBUI extends JFrame implements ActionListener {
         this.delegate = delegate;
     }
 
+    public DBUI() {
+        super("MovieAward DBMS GUI");
+    }
+
     public void invoke(AddAwardDelegate delegate) {
         this.delegate = delegate;
         SwingUtilities.invokeLater(new Runnable() {
@@ -40,12 +50,21 @@ public class DBUI extends JFrame implements ActionListener {
         });
     }
 
+    public void invoke() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new DBUI().initialize();
+            }
+        });
+    }
+
     // MODIFIES: this
     // EFFECTS: initialize user interface
     public void initialize() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        this.setPreferredSize(new Dimension(300,400));
+        this.setPreferredSize(new Dimension(500, 600));
         container = getContentPane();
         container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
         constraints = new GridBagConstraints();
@@ -62,8 +81,8 @@ public class DBUI extends JFrame implements ActionListener {
         buttonPane = new JPanel();
         buttonPane.setLayout(new GridBagLayout());
         // set panel
-        String[] chos = { "insert", "delete", "update", "selection", "projection",
-                "join", "aggregation", "nestedAgg", "division", "show", "quit" };
+        String[] chos = {"insert", "delete", "update", "selection", "projection",
+                "join", "aggregation", "nestedAgg", "division", "show", "quit"};
         int i = 0, c = 3;
         JButton cur;
         for (String cho : chos) {
@@ -117,16 +136,22 @@ public class DBUI extends JFrame implements ActionListener {
                 break;
             case "selection":
                 handleSelectionOption();
+                break;
             case "projection":
                 handleProjectionOption();
+                break;
             case "join":
                 handleJoinOption();
+                break;
             case "aggregate":
                 handleAggregateOption();
+                break;
             case "nestedAgg":
                 handleNestedAggOption();
+                break;
             case "division":
                 handleDivisionOption();
+                break;
             case "show":
                 handleShowOption();
                 break;
@@ -142,7 +167,6 @@ public class DBUI extends JFrame implements ActionListener {
     // processing fns
     public void setupDatabase(AddAwardDelegate delegate) {
         this.delegate = delegate;
-        if (delegate == null) System.out.println("3delegate = " + delegate);
         delegate.awarddatabaseSetup();
     }
 
@@ -250,45 +274,135 @@ public class DBUI extends JFrame implements ActionListener {
         JPanel p = new JPanel(new BorderLayout(5, 5));
 
         JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
-        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
-        labels.add(new JLabel("Enter award name: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("ID condition: ", SwingConstants.RIGHT));
+        // labels.add(new JLabel("Award name condition: ", SwingConstants.RIGHT));
+        // labels.add(new JLabel("Start date condition: ", SwingConstants.RIGHT));
+        // labels.add(new JLabel("End date condition: ", SwingConstants.RIGHT));
         p.add(labels, BorderLayout.WEST);
 
         JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
-        JTextField enterid = new JTextField("");
-        JTextField entername = new JTextField("");
-        p.add(controls, BorderLayout.CENTER);
-        controls.add(enterid);
-        controls.add(entername);
+        JTextField f1 = new JTextField("");
+        // JTextField f2 = new JTextField("");
+        // JTextField f3 = new JTextField("");
+        // JTextField f4 = new JTextField("");
 
-        int input = JOptionPane.showOptionDialog(null, p, "Update Award",
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(f1);
+        // controls.add(f2);
+        // controls.add(f3);
+        // controls.add(f4);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Award Selection",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
+        JTextField[] cur = {f1}; // , f2, f3, f4};
+        // List<String> res = new ArrayList<>();
+        String res = "";
         if (input == JOptionPane.OK_OPTION) {
-            int aID = INVALID_INPUT;
-            while (aID == INVALID_INPUT) {
-                aID = Integer.parseInt(enterid.getText());
-                String name = null;
-                name = entername.getText();
-                if (aID != INVALID_INPUT) {
-                    delegate.updateAward(aID, name);
-                }
-            }
+//            for (JTextField j : cur) {
+//                String cond = j.getText();
+//                if (!cond.equals("")) res.add(cond);
+//            }
+            res = f1.getText();
         }
+        delegate.selectAward(res);
     }
 
-    private void handleProjectionOption() {}
+    private void handleProjectionOption() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
 
-    private void handleJoinOption() {}
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Selected Fields: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
 
-    private void handleAggregateOption() {}
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField f1 = new JTextField("");
+        JTextField f2 = new JTextField("");
+        // JTextField f3 = new JTextField("");
+        // JTextField f4 = new JTextField("");
 
-    private void handleNestedAggOption() {}
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(f1);
+        controls.add(f2);
+        // controls.add(f3);
+        // controls.add(f4);
 
-    private void handleDivisionOption() {}
+        int input = JOptionPane.showOptionDialog(null, p, "Award Projection",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+        JTextField[] cur = {f1, f2}; // , f3, f4};
+        List<String> res = new ArrayList<>();
+        if (input == JOptionPane.OK_OPTION) {
+            for (JTextField j : cur) {
+                String name = j.getText();
+                if (!name.equals("")) res.add(name);
+            }
+        }
+        delegate.projectAward(res);
+    }
+
+    private void handleJoinOption() {
+//        JPanel p = new JPanel(new BorderLayout(5, 5));
+//
+//        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+//        labels.add(new JLabel("Selected Fields: ", SwingConstants.RIGHT));
+//        p.add(labels, BorderLayout.WEST);
+//
+//        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+//        JTextField f1 = new JTextField("");
+//        JTextField f2 = new JTextField("");
+//        JTextField f3 = new JTextField("");
+//        JTextField f4 = new JTextField("");
+//
+//        p.add(controls, BorderLayout.CENTER);
+//        controls.add(f1);
+//        controls.add(f2);
+//        controls.add(f3);
+//        controls.add(f4);
+//
+//        int input = JOptionPane.showOptionDialog(null, p, "Award Selection",
+//                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+//
+//        JTextField[] cur = {f1, f2, f3, f4};
+//        List<String> res = new ArrayList<>();
+//        if (input == JOptionPane.OK_OPTION) {
+//            for (JTextField j : cur) {
+//                String cond = j.getText();
+//                if (!cond.equals("")) res.add(cond);
+//            }
+//        }
+//        delegate.joinAward(res);
+    }
+
+    private void handleAggregateOption() {
+    }
+
+    private void handleNestedAggOption() {
+    }
+
+    private void handleDivisionOption() {
+    }
 
     private void handleShowOption() {
-        delegate.showAward();
+        String[] colnm = {"ID", "StartDate", "EndDate", "AwardName"};
+        String[][] data = delegate.showAward();
+
+        DefaultTableModel model = new DefaultTableModel(data, colnm);
+        table = new JTable(model) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+        };
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+        container.remove(showPane);
+        showPanel();
+        showPane.add(table);
+        showPane.setBorder(BorderFactory.createLineBorder(Color.black));
+        reconstruct();
     }
 
     private void handleQuitOption() {
@@ -336,6 +450,7 @@ public class DBUI extends JFrame implements ActionListener {
 
     public static void main(String[] args) {
         // DBUI dbui = new DBUI();
-        // dbui.invoke();
+        DBUI dbui = new DBUI();
+        dbui.invoke();
     }
 }

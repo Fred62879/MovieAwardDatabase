@@ -8,6 +8,7 @@ import ui.AddAward;
 import ui.DBUI;
 import ui.LoginWindow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,17 +70,22 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.updateAward(aID, name);
     }
 
-    public void selectAward(List<String> fields) {
-        adbHandler.selectAward(fields);
+    public void selectAward(String award) {
+        adbHandler.selectAward(award);
     }
 
-    public String showAward() {
-        String res = "";
+    public void projectAward(List<String> fields) { adbHandler.projectAward(fields); }
+
+    public void joinAward(List<String> fields) { adbHandler.joinAward(fields); }
+
+    public String[][] showAward() {
         Award[] models = adbHandler.getAwardInfo();
+        String[][] res = new String[models.length][4];
 
         for (int i = 0; i < models.length; i++) {
             Award model = models[i];
-
+            String[] cur = { Integer.toString(model.getAID()), model.getName(), model.getStartDate(), model.getEndDate() };
+            res[i] = cur;
             // simplified output formatting; truncation may occur
             System.out.printf("%-10.10s", model.getAID());
             System.out.printf("%-20.20s", model.getName());

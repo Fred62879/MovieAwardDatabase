@@ -92,7 +92,46 @@ public class AwardDatabaseHandler {
         }
     }
 
-    public void selectAward(List<String> fields) {
+    // select * from ... where CONDs
+    // public void selectAward(List<String> fields) {
+    public String[] selectAward(String aid) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("Select * from award WHERE aID = ?");
+            ps.setInt(1, Integer.valueOf(aid));
+
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println(WARNING_TAG + " Award with id:" + aid + " does not exist!");
+            }
+            ps.
+            connection.commit();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
+    public void projectAward(List<String> fields) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("Select (?,?) from award");
+            ps.setString(1, fields.get(1));
+            ps.setString(2, fields.get(2));
+
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println(WARNING_TAG + " Award does not exist!");
+            }
+            connection.commit();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
+    // inner join
+    public void joinAward(List<String> fields) {
 
     }
 

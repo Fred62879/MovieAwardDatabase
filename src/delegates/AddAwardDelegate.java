@@ -8,9 +8,12 @@ public interface AddAwardDelegate {
 
     public void insertAward(Award model);
     public void deleteAward(int aID);
-    public void selectAward(List<String> fields);
     public void updateAward(int aID, String name);
-    public String showAward();
+    public void selectAward(String award);
+    public void projectAward(List<String> fields);
+    public void joinAward(List<String> fields);
+
+    public String[][] showAward();
 
     public void addAwardFinished();
 }
