@@ -94,7 +94,7 @@ public class AwardDatabaseHandler {
 
     // select * from ... where CONDs
     // public void selectAward(List<String> fields) {
-    public String[] selectAward(String aid) {
+    public void selectAward(String aid) {
         try {
             PreparedStatement ps = connection.prepareStatement("Select * from award WHERE aID = ?");
             ps.setInt(1, Integer.valueOf(aid));
@@ -103,7 +103,7 @@ public class AwardDatabaseHandler {
             if (rowCount == 0) {
                 System.out.println(WARNING_TAG + " Award with id:" + aid + " does not exist!");
             }
-            ps.
+            // ps.
             connection.commit();
             ps.close();
         } catch (SQLException e) {
