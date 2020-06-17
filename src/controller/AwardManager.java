@@ -69,6 +69,10 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.updateAward(aID, name);
     }
 
+    public String findStaffIds(String role) {
+        return adbHandler.findStaffIds(role);
+    }
+
     public void selectAward(List<String> fields) {
         adbHandler.selectAward(fields);
     }

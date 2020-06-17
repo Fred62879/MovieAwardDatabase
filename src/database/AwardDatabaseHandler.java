@@ -4,6 +4,7 @@ import model.Award;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -149,13 +150,42 @@ public class AwardDatabaseHandler {
         dropAwardTableIfExists();
         try {
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE award (aID integer PRIMARY KEY, " +
+            stmt.executeUpdate(
+                    "CREATE TABLE award (aID integer PRIMARY KEY, " +
                     "startdate varchar2(10), enddate varchar2(10), " + "name varchar2(20) not null)");
+            stmt.executeUpdate("CREATE TABLE moviestaff (id integer PRIMARY KEY, " +
+                            "staffname varchar2(20), dob varchar2(10), role varchar2(20))");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (19285746, 'Daniel', '08/14/2020', 'Actor')");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (12345678, 'Ivan', '08/24/2020', 'Actor')");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (15678349, 'David', '08/04/2010', 'Director')");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (01928347, 'Felicia', '08/12/2020', 'Director')");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (57392047, 'Andy', '08/11/2020', 'Actor')");
+            stmt.executeUpdate("INSERT INTO moviestaff VALUES (02937586, 'Daria', '08/31/2020', 'Actor')");
             System.out.println("Occurred");
             stmt.close();
         } catch (SQLException e) {
             System.out.println(EXCEPTION_TAG + " " + e.getMessage());
         }
+    }
+
+    public String findStaffIds(String role) {
+        ArrayList<String> result = new ArrayList<String>();
+
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM moviestaff where role = " + role);
+
+            while (rs.next()) {
+                result.add(Integer.toString(rs.getInt("id")));
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return Arrays.toString(result.toArray(new String[result.size()]));
     }
 
     private void dropAwardTableIfExists() {
@@ -166,6 +196,7 @@ public class AwardDatabaseHandler {
             while(rs.next()) {
                 if(rs.getString(1).toLowerCase().equals("award")) {
                     stmt.execute("DROP TABLE award");
+                    stmt.execute("DROP TABLE moviestaff");
                     break;
                 }
             }

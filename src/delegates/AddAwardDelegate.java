@@ -10,6 +10,7 @@ public interface AddAwardDelegate {
     public void deleteAward(int aID);
     public void selectAward(List<String> fields);
     public void updateAward(int aID, String name);
+    public String findStaffIds(String role);
     public String showAward();
 
     public void addAwardFinished();
