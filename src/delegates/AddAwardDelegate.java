@@ -20,6 +20,7 @@ public interface AddAwardDelegate {
     public String[][] showAward();
     public String[][] showNominee();
     public String findWinningNom(int award_id);
+    public String findTotalVotes();
     public String findStaffIds(String role);
     // public String showAward();
 

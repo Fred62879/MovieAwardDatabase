@@ -526,6 +526,9 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleNestedAggOption() {
+        String totalVotes = delegate.findTotalVotes();
+        System.out.println(totalVotes);
+        displayStringDialog(totalVotes);
     }
 
     private void handleDivisionOption() {

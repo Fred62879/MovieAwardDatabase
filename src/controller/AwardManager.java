@@ -92,6 +92,11 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         return adbHandler.findWinningNom(award_id);
     }
 
+    @Override
+    public String findTotalVotes() {
+        return adbHandler.findTotalVotes();
+    }
+
     public void selectAward(List<String> fields) {
         // adbHandler.selectAward(fields);
     }

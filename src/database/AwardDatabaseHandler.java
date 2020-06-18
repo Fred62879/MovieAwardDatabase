@@ -326,6 +326,7 @@ public class AwardDatabaseHandler {
                     "vote_count integer, id integer, award_id integer, foreign key (id) references moviestaff(id), " +
                             "foreign key (award_id) references award(aID))");
             stmt.executeUpdate("INSERT INTO award VALUES (1, '08/12/2019', '08/14/2020', 'The Award')");
+            stmt.executeUpdate("INSERT INTO award VALUES (12, '08/11/2019', '08/15/2020', 'The Award 2')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (19285746, 'Daniel', '08/14/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (12345678, 'Ivan', '08/24/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (15678349, 'David', '08/04/2010', 'Director')");
@@ -334,6 +335,8 @@ public class AwardDatabaseHandler {
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (02937586, 'Daria', '08/31/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO nominee VALUES (0, 0, 19285746, 1)");
             stmt.executeUpdate("INSERT INTO nominee VALUES (1, 6, 12345678, 1)");
+            stmt.executeUpdate("INSERT INTO nominee VALUES (2, 0, 01928347, 12)");
+            stmt.executeUpdate("INSERT INTO nominee VALUES (3, 6, 12345678, 12)");
             System.out.println("Occurred");
             stmt.close();
         } catch (SQLException e) {
@@ -350,6 +353,26 @@ public class AwardDatabaseHandler {
 
             while (rs.next()) {
                 result.add(Integer.toString(rs.getInt("id")));
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return Arrays.toString(result.toArray(new String[result.size()]));
+    }
+
+    public String findTotalVotes() {
+        ArrayList<String> result = new ArrayList<String>();
+
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT sum(vote_count), award_id FROM nominee group by award_id");
+
+            while (rs.next()) {
+                result.add("(" + rs.getInt("sum(vote_count)") + ", " + rs.getInt("award_id") + ")");
             }
 
             rs.close();
@@ -381,6 +404,8 @@ public class AwardDatabaseHandler {
 
         return winningnom;
     }
+
+
 
     private void dropAwardTableIfExists() {
         try {
