@@ -40,7 +40,7 @@ public class DBUI extends JFrame implements ActionListener {
     private BufferedReader bufferedReader = null;
     private AddAwardDelegate delegate = null;
 
-    private int nomnumber = 0;
+    private int nomnumber = 3;
     private FlowLayout flayout = new FlowLayout(FlowLayout.CENTER, 5, 0);
 
 

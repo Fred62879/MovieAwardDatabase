@@ -410,9 +410,12 @@ public class AwardDatabaseHandler {
 
         try {
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from nominee as n" +
-                    "where not exists ((select a.award_id from award as a)" +
-                    "except (select np.id from nominee np where np.id = n.id))");
+            ResultSet rs = stmt.executeQuery(
+                    "select award_id, id from nominee n " +
+                    "where not exists "
+                    + "((select award_id from award) " +
+                    "minus (select np.award_id from nominee np where np.id = n.id))"
+            );
 
             while (rs.next()) {
                 result.add(Integer.toString(rs.getInt("id")));
