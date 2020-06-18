@@ -2,6 +2,7 @@ package ui;
 
 import delegates.AddAwardDelegate;
 import model.Award;
+import model.Nominee;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -39,7 +40,7 @@ public class DBUI extends JFrame implements ActionListener {
     private BufferedReader bufferedReader = null;
     private AddAwardDelegate delegate = null;
 
-    private int tabnumber = 0;
+    private int nomnumber = 0;
     private FlowLayout flayout = new FlowLayout(FlowLayout.CENTER, 5, 0);
 
 
@@ -102,7 +103,7 @@ public class DBUI extends JFrame implements ActionListener {
         buttonPane.setLayout(new GridBagLayout());
         // set panel
         String[] chos = { "insert", "delete", "update", "selection", "projection",
-                "join", "aggregation", "nestedAgg", "division", "show", "addnom", "quit" };
+                "join", "aggregation", "nestedAgg", "division", "show", "addnom", "votenom", "shownom", "quit" };
         int i = 0, c = 3;
         JButton cur;
         for (String cho : chos) {
@@ -180,6 +181,14 @@ public class DBUI extends JFrame implements ActionListener {
             case "addnom":
                 handleInsertNomineeOption();
                 break;
+            case "votenom":
+                handleVoteNomineeOption();
+                break;
+            case "shownom":
+                String[] nomcolnm = {"Nom_id", "Vote Count", "Staff id", "Award id"};
+                String[][] nomdata = delegate.showNominee();
+                handleShowOption(nomcolnm, nomdata);
+                break;
             case "quit":
                 handleQuitOption();
                 break;
@@ -242,12 +251,15 @@ public class DBUI extends JFrame implements ActionListener {
 
         JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
         labels.add(new JLabel("Enter staff ID: ", SwingConstants.RIGHT));
+        labels.add(new JLabel("Enter award ID: ", SwingConstants.RIGHT));
         p.add(labels, BorderLayout.WEST);
 
         JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
         JTextField enterid = new JTextField("");
+        JTextField enteraid = new JTextField("");
         p.add(controls, BorderLayout.CENTER);
         controls.add(enterid);
+        controls.add(enteraid);
 
         int input = JOptionPane.showOptionDialog(null, p, "Add Nominee",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
@@ -256,9 +268,11 @@ public class DBUI extends JFrame implements ActionListener {
             int id = INVALID_INPUT;
             while (id == INVALID_INPUT) {
                 id = Integer.parseInt(enterid.getText());
+                int aid = Integer.parseInt(enteraid.getText());
                 if (id != INVALID_INPUT) {
-                    //Somehow need to get name, dob, role from database from id
-                    // addDestComp("name", "id", "dob", "role");
+                    nomnumber +=1;
+                    Nominee nominee = new Nominee(nomnumber, 0, id, aid);
+                    delegate.insertNominee(nominee);
                 }
             }
         }
@@ -315,6 +329,32 @@ public class DBUI extends JFrame implements ActionListener {
                 name = entername.getText();
                 if (aID != INVALID_INPUT) {
                     delegate.updateAward(aID, name);
+                }
+            }
+        }
+    }
+
+    private void handleVoteNomineeOption() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+        labels.add(new JLabel("Enter nominee ID: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
+
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enternomid = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enternomid);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Vote for Nominee",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+        if (input == JOptionPane.OK_OPTION) {
+            int nom_id = INVALID_INPUT;
+            while (nom_id == INVALID_INPUT) {
+                nom_id = Integer.parseInt(enternomid.getText());
+                if (nom_id != INVALID_INPUT) {
+                    delegate.voteNominee(nom_id);
                 }
             }
         }

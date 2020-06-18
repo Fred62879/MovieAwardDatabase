@@ -1,6 +1,7 @@
 package database;
 
 import model.Award;
+import model.Nominee;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -56,6 +57,24 @@ public class AwardDatabaseHandler {
         }
     }
 
+    public void insertNominee(Nominee model) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO nominee VALUES (?,?,?,?)");
+            ps.setInt(1, model.getNomID());
+            ps.setInt(2, model.getVoteCount());
+            ps.setInt(3, model.getID());
+            ps.setInt(4, model.getAwardID());
+
+            ps.executeUpdate();
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
     public void deleteAward(int aID) {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM award WHERE aID = ?");
@@ -77,7 +96,7 @@ public class AwardDatabaseHandler {
 
     public void updateAward(int aID, String name) {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE name SET name = ? WHERE aID = ?");
+            PreparedStatement ps = connection.prepareStatement("UPDATE award SET name = ? WHERE aID = ?");
             ps.setString(1, name);
             ps.setInt(2, aID);
 
@@ -91,6 +110,42 @@ public class AwardDatabaseHandler {
             System.out.println(EXCEPTION_TAG + " " + e.getMessage());
             rollbackConnection();
         }
+    }
+
+    public void voteNominee(int nom_id) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE nominee SET vote_count = vote_count + 1 WHERE nom_id = ?");
+            ps.setInt(1, nom_id);
+
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println(WARNING_TAG + " Award " + nom_id + " does not exist!");
+            }
+            connection.commit();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
+    public Integer getNomineeVotes(int nom_id) {
+        int votes = 0;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT vote_count from nominee where nom_id = " + nom_id);
+
+            while (rs.next()) {
+                votes = rs.getInt("vote_count");
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return votes;
     }
 
     // select * from ... where CONDs
@@ -209,6 +264,30 @@ public class AwardDatabaseHandler {
         return result.toArray(new Award[result.size()]);
     }
 
+    public Nominee[] getNomineeInfo() {
+        ArrayList<Nominee> result = new ArrayList<Nominee>();
+
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM nominee");
+
+            while (rs.next()) {
+                Nominee model = new Nominee(rs.getInt("nom_id"),
+                        rs.getInt("vote_count"),
+                        rs.getInt("id"),
+                        rs.getInt("award_id"));
+                result.add(model);
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return result.toArray(new Nominee[result.size()]);
+    }
+
     public boolean login(String username, String password) {
         try {
             if (connection != null) {
@@ -243,12 +322,17 @@ public class AwardDatabaseHandler {
                     "startdate varchar2(10), enddate varchar2(10), " + "name varchar2(20) not null)");
             stmt.executeUpdate("CREATE TABLE moviestaff (id integer PRIMARY KEY, " +
                             "staffname varchar2(20), dob varchar2(10), role varchar2(20))");
+            stmt.executeUpdate("CREATE TABLE nominee (nom_id integer PRIMARY KEY, " +
+                    "vote_count integer, id integer, award_id integer, foreign key (id) references moviestaff(id), " +
+                            "foreign key (award_id) references award(aID))");
+            stmt.executeUpdate("INSERT INTO award VALUES (1, '08/12/2019', '08/14/2020', 'The Award')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (19285746, 'Daniel', '08/14/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (12345678, 'Ivan', '08/24/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (15678349, 'David', '08/04/2010', 'Director')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (01928347, 'Felicia', '08/12/2020', 'Director')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (57392047, 'Andy', '08/11/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (02937586, 'Daria', '08/31/2020', 'Actor')");
+            stmt.executeUpdate("INSERT INTO nominee VALUES (0, 0, 19285746, 1)");
             System.out.println("Occurred");
             stmt.close();
         } catch (SQLException e) {
@@ -283,6 +367,7 @@ public class AwardDatabaseHandler {
 
             while(rs.next()) {
                 if(rs.getString(1).toLowerCase().equals("award")) {
+                    stmt.execute("DROP TABLE nominee");
                     stmt.execute("DROP TABLE award");
                     stmt.execute("DROP TABLE moviestaff");
                     break;

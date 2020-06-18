@@ -1,17 +1,19 @@
 package model;
 
 public class Nominee {
-    private final String nom_ID;
+    private final int nom_ID;
     private final int vote_count;
-    private final String award_id;
+    private final int id;
+    private final int award_id;
 
-    public Nominee(String nomID, int voteCount, String awardId) {
+    public Nominee(int nomID, int voteCount, int id, int  awardId) {
         this.nom_ID = nomID;
         this.vote_count = voteCount;
+        this.id = id;
         this.award_id = awardId;
     }
 
-    public String getNomID() {
+    public int getNomID() {
         return nom_ID;
     }
 
@@ -19,7 +21,11 @@ public class Nominee {
         return vote_count;
     }
 
-    public String getAwardID() {
+    public int getID() {
+        return id;
+    }
+
+    public int getAwardID() {
         return award_id;
     }
 }

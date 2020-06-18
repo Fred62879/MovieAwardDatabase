@@ -4,6 +4,7 @@ import database.AwardDatabaseHandler;
 import delegates.AddAwardDelegate;
 import delegates.LoginWindowDelegate;
 import model.Award;
+import model.Nominee;
 import ui.AddAward;
 import ui.DBUI;
 import ui.LoginWindow;
@@ -62,6 +63,11 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.insertAward(model);
     }
 
+    @Override
+    public void insertNominee(Nominee model) {
+        adbHandler.insertNominee(model);
+    }
+
     public void deleteAward(int aID) {
         adbHandler.deleteAward(aID);
     }
@@ -70,8 +76,13 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         adbHandler.updateAward(aID, name);
     }
 
+    @Override
+    public void voteNominee(int nom_id) {
+        adbHandler.voteNominee(nom_id);
+    }
 
-//    public void selectAward(String award) {
+
+    //    public void selectAward(String award) {
 //        adbHandler.selectAward(award);
     public String findStaffIds(String role) {
         return adbHandler.findStaffIds(role);
@@ -98,6 +109,26 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
             System.out.printf("%-20.20s", model.getName());
             System.out.printf("%-20.20s", model.getStartDate());
             System.out.printf("%-20.20s", model.getEndDate());
+            System.out.println();
+        }
+        return res;
+    }
+
+    @Override
+    public String[][] showNominee() {
+        Nominee[] models = adbHandler.getNomineeInfo();
+        String[][] res = new String[models.length][4];
+
+        for (int i = 0; i < models.length; i++) {
+            Nominee model = models[i];
+            String[] cur = { Integer.toString(model.getNomID()), Integer.toString(model.getVoteCount()),
+                    Integer.toString(model.getID()), Integer.toString(model.getAwardID()) };
+            res[i] = cur;
+            // simplified output formatting; truncation may occur
+            System.out.printf("%-10.10s", model.getNomID());
+            System.out.printf("%-20.20s", model.getVoteCount());
+            System.out.printf("%-20.20s", model.getID());
+            System.out.printf("%-20.20s", model.getAwardID());
             System.out.println();
         }
         return res;
