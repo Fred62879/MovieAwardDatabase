@@ -88,6 +88,10 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         return adbHandler.findStaffIds(role);
     }
 
+    public String findWinningNom(int award_id) {
+        return adbHandler.findWinningNom(award_id);
+    }
+
     public void selectAward(List<String> fields) {
         // adbHandler.selectAward(fields);
     }
@@ -133,6 +137,7 @@ public class AwardManager implements LoginWindowDelegate, AddAwardDelegate {
         }
         return res;
     }
+
 
     public void addAwardFinished() {
         adbHandler.close();

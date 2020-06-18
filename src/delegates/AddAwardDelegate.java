@@ -19,6 +19,7 @@ public interface AddAwardDelegate {
     public List<String[]> joinAward(List<String> f1, List<String> f2, String t1, String t2, String c1, String c2);
     public String[][] showAward();
     public String[][] showNominee();
+    public String findWinningNom(int award_id);
     public String findStaffIds(String role);
     // public String showAward();
 

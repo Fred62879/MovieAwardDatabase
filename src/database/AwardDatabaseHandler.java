@@ -333,6 +333,7 @@ public class AwardDatabaseHandler {
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (57392047, 'Andy', '08/11/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO moviestaff VALUES (02937586, 'Daria', '08/31/2020', 'Actor')");
             stmt.executeUpdate("INSERT INTO nominee VALUES (0, 0, 19285746, 1)");
+            stmt.executeUpdate("INSERT INTO nominee VALUES (1, 6, 12345678, 1)");
             System.out.println("Occurred");
             stmt.close();
         } catch (SQLException e) {
@@ -358,6 +359,27 @@ public class AwardDatabaseHandler {
         }
 
         return Arrays.toString(result.toArray(new String[result.size()]));
+    }
+
+    public String findWinningNom(int award_id) {
+        String winningnom = null;
+
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT id from nominee where vote_count = " +
+                    "(select max(vote_count) from nominee where award_id = " + award_id + ")");
+
+            while (rs.next()) {
+                winningnom = rs.getString("id");
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return winningnom;
     }
 
     private void dropAwardTableIfExists() {

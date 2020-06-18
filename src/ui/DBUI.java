@@ -103,7 +103,7 @@ public class DBUI extends JFrame implements ActionListener {
         buttonPane.setLayout(new GridBagLayout());
         // set panel
         String[] chos = { "insert", "delete", "update", "selection", "projection",
-                "join", "aggregation", "nestedAgg", "division", "show", "addnom", "votenom", "shownom", "quit" };
+                "join", "WinningNom", "nestedAgg", "division", "show", "addnom", "votenom", "shownom", "quit" };
         int i = 0, c = 3;
         JButton cur;
         for (String cho : chos) {
@@ -164,7 +164,7 @@ public class DBUI extends JFrame implements ActionListener {
             case "join":
                 handleJoinOption();
                 break;
-            case "aggregate":
+            case "WinningNom":
                 handleAggregateOption();
                 break;
             case "nestedAgg":
@@ -503,6 +503,26 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleAggregateOption() {
+        JPanel p = new JPanel(new BorderLayout(5, 5));
+
+        JPanel labels = new JPanel(new GridLayout(0, 1, 2, 2));
+
+        labels.add(new JLabel("Enter award id: ", SwingConstants.RIGHT));
+        p.add(labels, BorderLayout.WEST);
+
+        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+        JTextField enteraid = new JTextField("");
+        p.add(controls, BorderLayout.CENTER);
+        controls.add(enteraid);
+
+        int input = JOptionPane.showOptionDialog(null, p, "Find Winning Nomination",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+        if (input == JOptionPane.OK_OPTION) {
+            Integer award_id = Integer.parseInt(enteraid.getText());
+            String winningnom = delegate.findWinningNom(award_id);
+            System.out.println(winningnom);
+            displayStringDialog(winningnom);
+        }
     }
 
     private void handleNestedAggOption() {
