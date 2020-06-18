@@ -532,6 +532,9 @@ public class DBUI extends JFrame implements ActionListener {
     }
 
     private void handleDivisionOption() {
+        String allnomedstaff = delegate.findAllNomedStaff();
+        System.out.println(allnomedstaff);
+        displayStringDialog(allnomedstaff);
     }
 
     private void handleShowOption(String[] colnm, String[][] data) {

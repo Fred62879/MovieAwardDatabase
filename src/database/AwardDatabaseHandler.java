@@ -405,7 +405,27 @@ public class AwardDatabaseHandler {
         return winningnom;
     }
 
+    public String findAllNomedStaff() {
+        ArrayList<String> result = new ArrayList<String>();
 
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from nominee as n" +
+                    "where not exists ((select a.award_id from award as a)" +
+                    "except (select np.id from nominee np where np.id = n.id))");
+
+            while (rs.next()) {
+                result.add(Integer.toString(rs.getInt("id")));
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+
+        return Arrays.toString(result.toArray(new String[result.size()]));
+    }
 
     private void dropAwardTableIfExists() {
         try {
